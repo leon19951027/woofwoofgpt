@@ -1,8 +1,8 @@
 package main
 
 import (
-	"myopenai/config"
-	"myopenai/web"
+	"github.com/leon19951027/woofwoofgpt/config"
+	"github.com/leon19951027/woofwoofgpt/web"
 )
 
 func main() {

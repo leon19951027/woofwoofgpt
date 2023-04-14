@@ -1,7 +1,9 @@
 package web
 
 import (
-	"myopenai/config"
+	"fmt"
+
+	"github.com/leon19951027/woofwoofgpt/config"
 )
 
 type Web struct {
@@ -12,6 +14,7 @@ type Web struct {
 func (w *Web) ApplyCfg(cfg *config.Cfg) {
 	w.Host = cfg.Host
 	w.Port = cfg.Port
+	fmt.Println(w)
 }
 
 func (w *Web) Run() {
