@@ -9,7 +9,7 @@ func main() {
 	cfg := config.ReadConf()
 	websvc := &web.Web{}
 	websvc.ApplyCfg(cfg)
-
+	websvc.Run()
 	// config := openai.DefaultConfig("")
 
 	// config.BaseURL = "https://woofgpt.uk/v1"

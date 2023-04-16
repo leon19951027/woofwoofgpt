@@ -6,7 +6,7 @@ import (
 
 type Server struct {
 	Host string
-	Port int
+	Port string
 }
 
 type GlobalOpenai struct {
@@ -31,7 +31,7 @@ func ReadConf() *Cfg {
 		panic(err)
 	}
 	cfg.Server.Host = viper.GetString("server.host")
-	cfg.Server.Port = viper.GetInt("server.port")
+	cfg.Server.Port = viper.GetString("server.port")
 	cfg.GlobalOpenai.UrlPrefix = viper.GetString("globalOpenai.urlPrefix")
 	return cfg
 }
