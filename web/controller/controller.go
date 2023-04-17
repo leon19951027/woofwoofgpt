@@ -1,11 +1,14 @@
 package controller
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	jsoniter "github.com/json-iterator/go"
+	"github.com/leon19951027/woofwoofgpt/openai"
 )
 
 var upgrader = websocket.Upgrader{
@@ -16,7 +19,11 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func Strem_Chat(c *gin.Context) {
+func Login(c *gin.Context) {
+
+}
+
+func Stream_Chat(c *gin.Context) {
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println("Failed to set websocket upgrade:", err)
@@ -34,14 +41,32 @@ func Strem_Chat(c *gin.Context) {
 		}
 
 		// 打印接收到的消息
-		log.Printf("Received message: %s\n", msg)
 
-		// 将接收到的消息原样发回客户端
-		err = conn.WriteMessage(msgType, msg)
+		log.Printf("Received message: %s\n", msg)
+		chatmsgs := &openai.ChatMessages{}
+		json := jsoniter.ConfigCompatibleWithStandardLibrary
+		err = json.Unmarshal(msg, chatmsgs)
 		if err != nil {
-			log.Println("write:", err)
-			break
+			log.Println(err)
+			continue
 		}
+		doneChan := make(chan bool)
+		msgsChan := make(chan string, 10)
+		go openai.Chat(chatmsgs, "", "https://woofgpt.uk/v1", msgsChan, doneChan)
+
+	LOOP:
+		for {
+			select {
+			case resp := <-msgsChan:
+				conn.WriteMessage(msgType, []byte(resp))
+			case isDone := <-doneChan:
+				if isDone {
+					break LOOP
+				}
+			}
+		}
+		fmt.Println("ws done")
+
 	}
 }
 
