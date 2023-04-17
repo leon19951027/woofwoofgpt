@@ -90,7 +90,7 @@ func Chunk_Chat(c *gin.Context) {
 
 		return
 	}
-	fmt.Println(chatmsgs)
+	//fmt.Println(chatmsgs)
 	doneChan := make(chan bool)
 	msgsChan := make(chan string, 10)
 	go openai.Chat(chatmsgs, OpenaiApiToken, OpenaiApiUrlPrefix, msgsChan, doneChan)

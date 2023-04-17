@@ -23,7 +23,7 @@ func Chat(messages *ChatMessages, apiKey string, baseUrl string, responseChan ch
 
 	var completionMessages []oai.ChatCompletionMessage
 	c := oai.NewClientWithConfig(config)
-	fmt.Println(messages.Ms)
+
 	for _, msg := range messages.Ms {
 		ccm := oai.ChatCompletionMessage{
 			Content: msg.Message,
@@ -52,7 +52,7 @@ func Chat(messages *ChatMessages, apiKey string, baseUrl string, responseChan ch
 		response, err := stream.Recv()
 		if errors.Is(err, io.EOF) {
 
-			fmt.Println("\nStream finished")
+			fmt.Println("\n OpenAI Stream finished")
 			break
 		}
 
