@@ -4,3 +4,4 @@ server:
   jwtSecrect: qwert123456
 globalOpenai:
   urlPrefix: https://woofgpt.uk/v1
+  apiToken: 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

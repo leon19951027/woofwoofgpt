@@ -12,7 +12,7 @@ type Server struct {
 
 type GlobalOpenai struct {
 	UrlPrefix string
-	Token     string
+	ApiToken  string
 }
 
 type Cfg struct {
@@ -35,5 +35,6 @@ func ReadConf() *Cfg {
 	cfg.Server.Port = viper.GetString("server.port")
 	cfg.Server.JwtSecrect = viper.GetString("server.jwtSecrect")
 	cfg.GlobalOpenai.UrlPrefix = viper.GetString("globalOpenai.urlPrefix")
+	cfg.GlobalOpenai.ApiToken = viper.GetString("globalOpenai.apiToken")
 	return cfg
 }

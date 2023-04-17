@@ -6,14 +6,8 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/leon19951027/woofwoofgpt/config"
-
 	oai "github.com/sashabaranov/go-openai"
 )
-
-func ApplyCfg(cfg *config.Cfg) {
-
-}
 
 type ChatMessages struct {
 	Ms []ChatMessage `json:"messages"`
@@ -40,7 +34,7 @@ func Chat(messages *ChatMessages, apiKey string, baseUrl string, responseChan ch
 	}
 	req := oai.ChatCompletionRequest{
 		Model:     oai.GPT3Dot5Turbo,
-		MaxTokens: 2000,
+		MaxTokens: 4000,
 		Messages:  completionMessages,
 		Stream:    true,
 	}
@@ -48,6 +42,7 @@ func Chat(messages *ChatMessages, apiKey string, baseUrl string, responseChan ch
 
 	stream, err := c.CreateChatCompletionStream(ctx, req)
 	if err != nil {
+		responseChan <- err.Error()
 		fmt.Printf("ChatCompletionStream error: %v\n", err)
 		return
 	}

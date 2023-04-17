@@ -21,6 +21,8 @@ func (w *Web) ApplyCfg(cfg *config.Cfg) {
 	w.Host = cfg.Host
 	w.Port = cfg.Port
 	w.JwtSecrect = cfg.JwtSecrect
+	controller.OpenaiApiToken = cfg.ApiToken
+	controller.OpenaiApiUrlPrefix = cfg.UrlPrefix
 
 }
 
@@ -30,6 +32,7 @@ func (w *Web) Run() {
 	v1 := h.Group("/api/v1", controller.Login)
 	//v1.Use(w.jwtMiddleware())
 	v1.GET("/stream-chat", controller.Stream_Chat)
+	v1.POST("/chunk-chat", controller.Chunk_Chat)
 	h.Run(w.Host + ":" + w.Port)
 }
 

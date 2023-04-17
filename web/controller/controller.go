@@ -2,6 +2,8 @@ package controller
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -10,6 +12,9 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"github.com/leon19951027/woofwoofgpt/openai"
 )
+
+var OpenaiApiToken string
+var OpenaiApiUrlPrefix string
 
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
@@ -52,7 +57,7 @@ func Stream_Chat(c *gin.Context) {
 		}
 		doneChan := make(chan bool)
 		msgsChan := make(chan string, 10)
-		go openai.Chat(chatmsgs, "", "https://woofgpt.uk/v1", msgsChan, doneChan)
+		go openai.Chat(chatmsgs, OpenaiApiToken, OpenaiApiUrlPrefix, msgsChan, doneChan)
 
 	LOOP:
 		for {
@@ -70,6 +75,42 @@ func Stream_Chat(c *gin.Context) {
 	}
 }
 
-func Http_Chat(c *gin.Context) {
+func Chunk_Chat(c *gin.Context) {
+	c.Writer.Header().Set("Transfer-Encoding", "chunked")
+	// 设置响应内容类型
+	c.Writer.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	//chatmsgs := &openai.ChatMessages{}
+	b, _ := ioutil.ReadAll(c.Request.Body)
+	chatmsgs := &openai.ChatMessages{}
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+	err := json.Unmarshal(b, chatmsgs)
+	if err != nil {
+
+		c.JSON(500, gin.H{"err": "反序列化错误,检查请求体"})
+
+		return
+	}
+	fmt.Println(chatmsgs)
+	doneChan := make(chan bool)
+	msgsChan := make(chan string, 10)
+	go openai.Chat(chatmsgs, OpenaiApiToken, OpenaiApiUrlPrefix, msgsChan, doneChan)
+
+LOOP:
+	for {
+		select {
+		case resp := <-msgsChan:
+			_, err := io.WriteString(c.Writer, resp)
+			if err != nil {
+				c.JSON(500, gin.H{"err": err})
+				break LOOP
+			}
+			c.Writer.Flush()
+		case isDone := <-doneChan:
+			if isDone {
+				break LOOP
+			}
+		}
+	}
+	fmt.Println("chunk stop")
 
 }
