@@ -28,7 +28,7 @@ func (w *Web) ApplyCfg(cfg *config.Cfg) {
 
 func (w *Web) Run() {
 	h := gin.Default()
-	h.POST("/login")
+	//h.POST("/login")
 	v1 := h.Group("/api/v1", controller.Login)
 	//v1.Use(w.jwtMiddleware())
 	v1.GET("/stream-chat", controller.Stream_Chat)
