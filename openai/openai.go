@@ -15,6 +15,7 @@ type ChatMessages struct {
 
 type ChatMessage struct {
 	Message string `json:"message"`
+	Role    string `json:"role"`
 }
 
 func Chat(messages *ChatMessages, apiKey string, baseUrl string, responseChan chan string, doneChan chan bool) {
@@ -25,13 +26,21 @@ func Chat(messages *ChatMessages, apiKey string, baseUrl string, responseChan ch
 	c := oai.NewClientWithConfig(config)
 
 	for _, msg := range messages.Ms {
+
 		ccm := oai.ChatCompletionMessage{
 			Content: msg.Message,
-			Role:    oai.ChatMessageRoleUser,
 		}
+		switch msg.Role {
+		case "system":
+			ccm.Role = oai.ChatMessageRoleSystem
+		default:
+			ccm.Role = oai.ChatMessageRoleUser
+		}
+
 		completionMessages = append(completionMessages, ccm)
 
 	}
+	fmt.Println(completionMessages)
 	req := oai.ChatCompletionRequest{
 		Model:     oai.GPT3Dot5Turbo,
 		MaxTokens: 4000,
@@ -51,19 +60,17 @@ func Chat(messages *ChatMessages, apiKey string, baseUrl string, responseChan ch
 	for {
 		response, err := stream.Recv()
 		if errors.Is(err, io.EOF) {
-
 			fmt.Println("\n OpenAI Stream finished")
 			break
 		}
 
 		if err != nil {
 			fmt.Printf("\nStream error: %v\n", err)
+			responseChan <- err.Error()
+			doneChan <- true
 			return
 		}
-
-		//	fmt.Printf(response.Choices[0].Delta.Content)
 		responseChan <- response.Choices[0].Delta.Content
 	}
-
 	doneChan <- true
 }

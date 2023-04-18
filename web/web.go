@@ -36,7 +36,7 @@ func (w *Web) Run() {
 	h.Run(w.Host + ":" + w.Port)
 }
 
-func (w Web) generateToken(username string) (string, error) {
+func (w *Web) generateToken(username string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": username,
 		"expire":   time.Now().Add(time.Hour * 24).Unix(),
