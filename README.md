@@ -2,7 +2,9 @@
 ## 启动
 保证可执行文件同目录下有config.yaml,之后直接启动即可
 ## 接口
-两个接口，data raw一样的
+两个接口，/api/v1/stream-chat是ws传输
+/api/v1/chunk-chat是http chunk传输
+data raw一样的
 ```json
 {
     "messages": [
@@ -16,5 +18,4 @@
     ]
 }
 ```
-/api/v1/stream-chat是ws传输
-/api/v1/chunk-chat是http chunk传输
+
